@@ -14,6 +14,7 @@ OBJ := $(SRC:.c=.o)
 
 # Libraries
 LIBS		:= -lSDL2
+LIBS		+= -lSDL2_ttf
 
 # Name of output file
 OUTPUT		:= $(TARGET)
