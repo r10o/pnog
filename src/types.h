@@ -1,20 +1,38 @@
-#ifndef PNOG_MAIN
-#define PNOG_MAIN
+#ifndef PNOG_TYPES
+#define PNOG_TYPES
 
-#include <SDL2/SDL.h>
+typedef struct Player {
+	int x;
+	int y;
+	int w;
+	int h;
+	int score;
+	int v_y;
+} Player_t;
 
-// the ball structure
 typedef struct Ball {
-	SDL_Rect rectangle;	// position rectangle
-	float v[2];		// velocity array
+	int x;
+	int y;
+	int r;
+	int score;
+	int v_x;
+	int v_y;
 } Ball_t;
 
-// the player structure
-typedef struct Player {
-	SDL_Rect rectangle;	// position rectangle
-	float v;		// vertical velocity
-	unsigned int score;	// player score
-} Player_t;
+typedef enum {
+	MENU,
+	GAME,
+	OPTIONS,
+	PAUSED,
+	STOPPED
+} States_t;
+
+typedef struct Game {
+	States_t state;
+	Player_t player;
+	Player_t cpu;
+	Ball_t ball;
+} Game_t;
 
 #endif
 
