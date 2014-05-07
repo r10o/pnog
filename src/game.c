@@ -1,5 +1,6 @@
 #include "types.h"
 #include "vars.h"
+#include "lib.h"
 
 void run()
 {
@@ -9,6 +10,7 @@ void run()
 				break;
 			case GAME:
 				while (game.state == GAME) {
+					manage_input();
 				}
 				break;
 			case OPTIONS:

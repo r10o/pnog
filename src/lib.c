@@ -41,15 +41,36 @@ void init_lib()
 void manage_input()
 {
 	SDL_Event event;
-	switch (SDL_PollEvent(&event)) {
-		default:
-			break;
+	const Uint8 *key_state;
+
+	key_state = SDL_GetKeyboardState(NULL);
+	if (key_state[SDL_SCANCODE_Q]) {
+		game.player.v_y = -20;
+	} else if (key_state[SDL_SCANCODE_A]) {
+		game.player.v_y = 20;
+	} else {
+		game.player.v_y = 0;
+	}
+
+	if (SDL_PollEvent(&event)) {
+		switch (event.type) {
+			case SDL_QUIT:
+				game.state = STOPPED;
+				break;
+			case SDL_KEYUP:
+				switch (event.key.keysym.sym) {
+					case SDLK_ESCAPE:
+						game.state = PAUSED;
+						break;
+				}
+		}
 	}
 }
 
 void draw(int count, ...)
 {
-	count = 0;
+	for (int i = 0; i < count; i++) {
+	}
 }
 
 void play_sound()
