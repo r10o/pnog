@@ -2,6 +2,7 @@
 #include <stdarg.h>
 
 #include <SDL2/SDL.h>
+#include <GL/glew.h>
 
 #include "lib.h"
 #include "vars.h"
@@ -12,7 +13,7 @@ SDL_Renderer *ren;
 void init_lib()
 {
 	if (SDL_Init(SDL_INIT_EVERYTHING)) {
-		printf("error:SDL_Init: %s\n", SDL_GetError());
+		fprintf(stderr, "error:SDL_Init: %s\n", SDL_GetError());
 		exit(1);
 	}
 
@@ -22,18 +23,25 @@ void init_lib()
 			SDL_WINDOWPOS_CENTERED,
 			WINDOW_WIDTH,
 			WINDOW_HEIGHT,
-			0 );
+			SDL_WINDOW_OPENGL );
 	if (window == NULL) {
-		printf("error:SDL_CreateWindow: %s", SDL_GetError());
+		fprintf(stderr, "error:SDL_CreateWindow: %s", SDL_GetError());
 		exit(1);
 	}
 
-	ren = SDL_CreateRenderer(
-		window,
-			-1,
-			SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC );
-	if (ren == NULL) {
-		printf("error:SDL_CreateRenderer: %s", SDL_GetError());
+	SDL_GLContext context = SDL_GL_CreateContext(window);
+	if (context == NULL) {
+		fprintf(stderr, "error:SDL_GL_CreateContext: %s", SDL_GetError());
+		exit(1);
+	}
+
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+
+	glewExperimental = GL_TRUE;
+	glewInit();
+	if (!GLEW_VERSION_3_1) {
+		fprintf(stderr, "error:glewInit: %s\n", SDL_GetError());
 		exit(1);
 	}
 }
@@ -69,8 +77,17 @@ void manage_input()
 
 void draw(int count, ...)
 {
-	for (int i = 0; i < count; i++) {
-	}
+	glClearColor(1, 1, 1, 1);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glColor3f(0, 0, 0);
+	glOrtho(0, 1, 0, 1, -1, 1);
+	glBegin(GL_POLYGON);
+		glVertex3f(0.25, 0.25, 0);
+	glEnd();
+	glFlush();
+
+	SDL_GL_SwapWindow(window);
+	count = 0;
 }
 
 void play_sound()
