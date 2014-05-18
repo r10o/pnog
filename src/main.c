@@ -9,7 +9,9 @@ int main()
 {
 	init_lib();
 
-	run();
+	init_game();
+
+	play();
 
 	cleanup();
 	return 0;

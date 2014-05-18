@@ -1,11 +1,12 @@
 #include <stdlib.h>
-#include <stdarg.h>
+#include <math.h>
 
 #include <SDL2/SDL.h>
 #include <GL/glew.h>
 
 #include "lib.h"
 #include "vars.h"
+#include "types.h"
 
 SDL_Window *window;
 SDL_Renderer *ren;
@@ -44,58 +45,107 @@ void init_lib()
 		fprintf(stderr, "error:glewInit: %s\n", SDL_GetError());
 		exit(1);
 	}
+
+	glOrtho(0, WINDOW_WIDTH / 400, 0, WINDOW_HEIGHT / 400, -1, 1);
+	glClearColor(1, 1, 1, 1);
+	glColor3f(0, 0, 0);
 }
 
-void manage_input()
+void manage_input(States_t game_state)
 {
 	SDL_Event event;
 	const Uint8 *key_state;
 
 	key_state = SDL_GetKeyboardState(NULL);
-	if (key_state[SDL_SCANCODE_Q]) {
-		game.player.v_y = -20;
-	} else if (key_state[SDL_SCANCODE_A]) {
-		game.player.v_y = 20;
-	} else {
-		game.player.v_y = 0;
-	}
 
-	if (SDL_PollEvent(&event)) {
-		switch (event.type) {
-			case SDL_QUIT:
-				game.state = STOPPED;
-				break;
-			case SDL_KEYUP:
-				switch (event.key.keysym.sym) {
-					case SDLK_ESCAPE:
-						game.state = PAUSED;
-						break;
-				}
-		}
+	switch (game_state) {
+		case MENU: break;
+		case GAME:
+			   if (key_state[SDL_SCANCODE_Q]) {
+				   game.player.v_y = 20;
+			   } else if (key_state[SDL_SCANCODE_A]) {
+				   game.player.v_y = -20;
+			   } else if (key_state[SDL_SCANCODE_K]) {
+				   game.player.v_y = 20;
+			   } else if (key_state[SDL_SCANCODE_J]) {
+				   game.player.v_y = -20;
+			   } else {
+				   game.player.v_y = 0;
+			   }
+
+			   if (SDL_PollEvent(&event)) {
+				   switch (event.type) {
+					   case SDL_QUIT:
+						   game.state = STOPPED;
+						   break;
+					   case SDL_KEYUP:
+						   switch (event.key.keysym.sym) {
+							   case SDLK_ESCAPE:
+								   game.state = PAUSED;
+								   break;
+						   }
+				   }
+			   }
+			   break;
+		case OPTIONS: break;
+		case PAUSED: break;
+		default: break;
 	}
 }
 
-void draw(int count, ...)
+void draw_player(Player_t player)
 {
-	glClearColor(1, 1, 1, 1);
-	glClear(GL_COLOR_BUFFER_BIT);
-	glColor3f(0, 0, 0);
-	glOrtho(0, 1, 0, 1, -1, 1);
 	glBegin(GL_POLYGON);
-		glVertex3f(0.25, 0.25, 0);
+	glVertex2i(player.x, player.y);
+	glVertex2i(player.x + player.w, player.y);
+	glVertex2i(player.x + player.w, player.y + player.h);
+	glVertex2i(player.x, player.y + player.h);
 	glEnd();
+}
+
+void draw_ball(Ball_t ball)
+{
+	float theta = 2 * 3.1415926 / 10.0f;
+	float tangetial_factor = tanf(theta);
+
+	float radial_factor = cosf(theta);
+
+	float x = ball.r;
+
+	float y = 0;
+
+	glBegin(GL_POLYGON);
+	for (int i = 0; i < 10; i++) {
+		glVertex2f(x + ball.x, y + ball.y);
+
+		float tx = -y;
+		float ty = x;
+
+		x += tx * tangetial_factor; 
+		y += ty * tangetial_factor; 
+
+		x *= radial_factor;
+		y *= radial_factor;
+	}
+	glEnd();
+}
+
+void draw_game(Game_t game)
+{
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	draw_player(game.player);
+	draw_player(game.cpu);
+	draw_ball(game.ball);
+
 	glFlush();
 
 	SDL_GL_SwapWindow(window);
-	count = 0;
 }
 
-void play_sound()
+int get_time()
 {
-}
-
-void play_music()
-{
+	return SDL_GetTicks();
 }
 
 void cleanup()

@@ -1,7 +1,8 @@
 #ifndef PNOG_GAME
 #define PNOG_GAME
 
-void run();
+void init_game(void);
+void play(void);
 
 #endif
 
