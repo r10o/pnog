@@ -1,24 +1,38 @@
+#include <stdio.h>
+
+#include "game.h"
+
 #include "types.h"
 #include "vars.h"
 #include "lib.h"
+#include "player.h"
+#include "ball.h"
 
 void init_game()
 {
 	game.state = GAME;
-	game.player = (Player_t){ 1, 42, 1, 16, 0, 0 };
-	game.cpu = (Player_t){ 198, 42, 1, 16, 0, 0 };
-	game.ball = (Ball_t){ 99, 49, 2, 0, 0 };
+	game.player = (Player_t){ 2, 42, 2, 16, 0, 0 };
+	game.cpu = (Player_t){ 196, 42, 2, 16, 0, 0 };
+	game.ball = (Ball_t){ 97, 47, 2, -3, 0 };
 }
 
-void update_game(int elapsed_time)
+void update_game()
 {
-	if (game.player.v_y < 0 && game.player.y > 0) {
-		game.player.y = (game.player.v_y * elapsed_time) + game.player.y;
-	} else {
-		game.player.y = (game.player.v_y * elapsed_time) + game.player.y;
+	if (detect_collision(game.ball, game.player, PNOG_COLLISION_PLAYER)) {
+		manage_collision_player(&game.ball, game.player);
 	}
 
-	game.cpu.y = (game.cpu.v_y * elapsed_time) + game.cpu.y;
+	if (detect_collision(game.ball, game.cpu, PNOG_COLLISION_CPU)) {
+		manage_collision_player(&game.ball, game.cpu);
+	}
+
+	if (detect_edge(game.ball)) {
+		manage_collision_wall(&game.ball);
+	}
+
+	move_player(&game.player);
+	move_player(&game.cpu);
+	move_ball(&game.ball);
 }
 
 void run_game()
@@ -30,7 +44,10 @@ void run_game()
 		current_time = get_time();
 		
 		manage_input(game.state);
-		update_game(current_time - previous_time);
+		if (current_time - previous_time >= TIME_PER_TICK) {
+			update_game();
+		}
+
 		draw_game(game);
 	}
 }

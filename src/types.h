@@ -7,15 +7,15 @@ typedef struct Player {
 	int w;
 	int h;
 	int score;
-	int v_y;
+	float v_y;
 } Player_t;
 
 typedef struct Ball {
 	int x;
 	int y;
 	int r;
-	int v_x;
-	int v_y;
+	float v_x;
+	float v_y;
 } Ball_t;
 
 typedef enum {

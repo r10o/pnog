@@ -8,9 +8,6 @@
 #include "vars.h"
 #include "types.h"
 
-SDL_Window *window;
-SDL_Renderer *ren;
-
 void init_lib()
 {
 	if (SDL_Init(SDL_INIT_EVERYTHING)) {
@@ -46,7 +43,7 @@ void init_lib()
 		exit(1);
 	}
 
-	glOrtho(0, WINDOW_WIDTH / 400, 0, WINDOW_HEIGHT / 400, -1, 1);
+	glOrtho(0, WINDOW_WIDTH / 4, 0, WINDOW_HEIGHT / 4, -1, 1);
 	glClearColor(1, 1, 1, 1);
 	glColor3f(0, 0, 0);
 }
@@ -62,13 +59,13 @@ void manage_input(States_t game_state)
 		case MENU: break;
 		case GAME:
 			   if (key_state[SDL_SCANCODE_Q]) {
-				   game.player.v_y = 20;
+				   game.player.v_y = 4;
 			   } else if (key_state[SDL_SCANCODE_A]) {
-				   game.player.v_y = -20;
+				   game.player.v_y = -4;
 			   } else if (key_state[SDL_SCANCODE_K]) {
-				   game.player.v_y = 20;
+				   game.player.v_y = 4;
 			   } else if (key_state[SDL_SCANCODE_J]) {
-				   game.player.v_y = -20;
+				   game.player.v_y = -4;
 			   } else {
 				   game.player.v_y = 0;
 			   }
@@ -96,16 +93,16 @@ void manage_input(States_t game_state)
 void draw_player(Player_t player)
 {
 	glBegin(GL_POLYGON);
-	glVertex2i(player.x, player.y);
-	glVertex2i(player.x + player.w, player.y);
-	glVertex2i(player.x + player.w, player.y + player.h);
-	glVertex2i(player.x, player.y + player.h);
+		glVertex2i(player.x, player.y);
+		glVertex2i(player.x + player.w, player.y);
+		glVertex2i(player.x + player.w, player.y + player.h);
+		glVertex2i(player.x, player.y + player.h);
 	glEnd();
 }
 
 void draw_ball(Ball_t ball)
 {
-	float theta = 2 * 3.1415926 / 10.0f;
+	float theta = 2 * 3.1415926 / 40.0f;
 	float tangetial_factor = tanf(theta);
 
 	float radial_factor = cosf(theta);
@@ -115,7 +112,7 @@ void draw_ball(Ball_t ball)
 	float y = 0;
 
 	glBegin(GL_POLYGON);
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 40; i++) {
 		glVertex2f(x + ball.x, y + ball.y);
 
 		float tx = -y;
@@ -151,7 +148,6 @@ int get_time()
 void cleanup()
 {
 	SDL_DestroyWindow(window);
-	SDL_DestroyRenderer(ren);
 	SDL_Quit();
 }
 
