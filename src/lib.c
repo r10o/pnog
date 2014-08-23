@@ -85,7 +85,21 @@ void manage_input(States_t game_state)
 			   }
 			   break;
 		case OPTIONS: break;
-		case PAUSED: break;
+		case PAUSED:
+			      if (SDL_PollEvent(&event)) {
+				      switch (event.type) {
+					      case SDL_QUIT:
+						      game.state = STOPPED;
+						      break;
+					      case SDL_KEYUP:
+						      switch (event.key.keysym.sym) {
+							      case SDLK_ESCAPE:
+								      game.state = GAME;
+								      break;
+						      }
+				      }
+			      }
+			      break;
 		default: break;
 	}
 }
@@ -93,10 +107,10 @@ void manage_input(States_t game_state)
 void draw_player(Player_t player)
 {
 	glBegin(GL_POLYGON);
-		glVertex2i(player.x, player.y);
-		glVertex2i(player.x + player.w, player.y);
-		glVertex2i(player.x + player.w, player.y + player.h);
-		glVertex2i(player.x, player.y + player.h);
+	glVertex2i(player.x, player.y);
+	glVertex2i(player.x + player.w, player.y);
+	glVertex2i(player.x + player.w, player.y + player.h);
+	glVertex2i(player.x, player.y + player.h);
 	glEnd();
 }
 

@@ -14,7 +14,7 @@ OBJ := $(SRC:.c=.o)
 
 # Libraries
 LIBS		:= -lSDL2
-LIBS		+= -lSDL2_ttf
+#LIBS		+= -lSDL2_ttf
 LIBS		+= -lGL
 LIBS		+= -lGLEW
 LIBS		+= -lm
@@ -27,7 +27,7 @@ LIB_LN_V	:=
 # CFLAGS
 CFLAGS		:= -Wall 
 CFLAGS		+= -pipe
-CLFAGS		+= -std=c99
+CLFAGS		+= -std=gnu99
 
 # Defines
 CFLAGS		+= -DVERSION=\"$(VERSION)\"

@@ -26,11 +26,15 @@ void manage_collision_wall(Ball_t *ball)
 
 void move_ball(Ball_t *ball)
 {
-	if (ball->x >= 0 && ball->x + ball->r <= 200) {
+	if (ball->v_x < 0 && ball->x >= 0) {
+		ball->x += ball->v_x;
+	} else if (ball->v_x > 0 && ball->x <= 200) {
 		ball->x += ball->v_x;
 	}
 
-	if (ball->y >= 0 && ball->y + ball->r <= 100) {
+	if (ball->v_y < 0 && ball->y >= 0) {
+		ball->y += ball->v_y;
+	} else if (ball->v_y > 0 && ball->y <= 100) {
 		ball->y += ball->v_y;
 	}
 }
