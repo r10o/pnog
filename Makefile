@@ -52,6 +52,12 @@ clean:
 	@rm -rvf $(DIR)/* $(OBJ) $(DIR)/*
 	@echo -e "\n>> done cleaning <<"
 
+cleanobj:
+	@echo -e ">> cleaning <<\n"
+	@rm -rvf $(OBJ)
+	@echo -e "\n>> done cleaning <<"
+
+
 dist:
 	@echo -e ">> making dist tarball <<\n"
 	@mkdir -vp $(TARGET)-$(VERSION)

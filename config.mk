@@ -40,7 +40,7 @@ PEDANTIC	:= yes
 OPTIMIZE 	:= no
 
 # Compiler and linker
-CC		:= clang
+CC		:= gcc
 
 # Paths
 PREFIX		:= /usr/local

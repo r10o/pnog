@@ -6,7 +6,9 @@
 
 #include "lib.h"
 #include "vars.h"
-#include "types.h"
+#include "game.h"
+#include "ball.h"
+#include "player.h"
 
 void init_lib()
 {
@@ -15,13 +17,11 @@ void init_lib()
 		exit(1);
 	}
 
-	window = SDL_CreateWindow(
-			"pnog",
-			SDL_WINDOWPOS_CENTERED,
-			SDL_WINDOWPOS_CENTERED,
-			WINDOW_WIDTH,
-			WINDOW_HEIGHT,
-			SDL_WINDOW_OPENGL );
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+
+	window = SDL_CreateWindow("pnog", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_OPENGL);
 	if (window == NULL) {
 		fprintf(stderr, "error:SDL_CreateWindow: %s", SDL_GetError());
 		exit(1);
@@ -33,52 +33,47 @@ void init_lib()
 		exit(1);
 	}
 
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 
 	glewExperimental = GL_TRUE;
-	glewInit();
-	if (!GLEW_VERSION_3_1) {
+	if (glewInit() != GLEW_OK) {
 		fprintf(stderr, "error:glewInit: %s\n", SDL_GetError());
 		exit(1);
 	}
 
-	glOrtho(0, WINDOW_WIDTH / 4, 0, WINDOW_HEIGHT / 4, -1, 1);
-	glClearColor(1, 1, 1, 1);
-	glColor3f(0, 0, 0);
+	glViewport(0, 0, 800, 600);
 }
 
-void manage_input(States_t game_state)
+void manage_input(Game_t* game)
 {
 	SDL_Event event;
 	const Uint8 *key_state;
 
 	key_state = SDL_GetKeyboardState(NULL);
 
-	switch (game_state) {
+	switch (game->state) {
 		case MENU: break;
 		case GAME:
 			   if (key_state[SDL_SCANCODE_Q]) {
-				   game.player.v_y = 4;
+				   game->player->v_y = 4;
 			   } else if (key_state[SDL_SCANCODE_A]) {
-				   game.player.v_y = -4;
+				   game->player->v_y = -4;
 			   } else if (key_state[SDL_SCANCODE_K]) {
-				   game.player.v_y = 4;
+				   game->player->v_y = 4;
 			   } else if (key_state[SDL_SCANCODE_J]) {
-				   game.player.v_y = -4;
+				   game->player->v_y = -4;
 			   } else {
-				   game.player.v_y = 0;
+				   game->player->v_y = 0;
 			   }
 
 			   if (SDL_PollEvent(&event)) {
 				   switch (event.type) {
 					   case SDL_QUIT:
-						   game.state = STOPPED;
+						   game->state = STOPPED;
 						   break;
 					   case SDL_KEYUP:
 						   switch (event.key.keysym.sym) {
 							   case SDLK_ESCAPE:
-								   game.state = PAUSED;
+								   game->state = PAUSED;
 								   break;
 						   }
 				   }
@@ -89,12 +84,12 @@ void manage_input(States_t game_state)
 			      if (SDL_PollEvent(&event)) {
 				      switch (event.type) {
 					      case SDL_QUIT:
-						      game.state = STOPPED;
+						      game->state = STOPPED;
 						      break;
 					      case SDL_KEYUP:
 						      switch (event.key.keysym.sym) {
 							      case SDLK_ESCAPE:
-								      game.state = GAME;
+								      game->state = GAME;
 								      break;
 						      }
 				      }
@@ -104,30 +99,30 @@ void manage_input(States_t game_state)
 	}
 }
 
-void draw_player(Player_t player)
+void draw_player(Player_t* player)
 {
 	glBegin(GL_POLYGON);
-	glVertex2i(player.x, player.y);
-	glVertex2i(player.x + player.w, player.y);
-	glVertex2i(player.x + player.w, player.y + player.h);
-	glVertex2i(player.x, player.y + player.h);
+		glVertex2i(player->x, player->y);
+		glVertex2i(player->x + player->w, player->y);
+		glVertex2i(player->x + player->w, player->y + player->h);
+		glVertex2i(player->x, player->y + player->h);
 	glEnd();
 }
 
-void draw_ball(Ball_t ball)
+void draw_ball(Ball_t* ball)
 {
 	float theta = 2 * 3.1415926 / 40.0f;
 	float tangetial_factor = tanf(theta);
 
 	float radial_factor = cosf(theta);
 
-	float x = ball.r;
+	float x = ball->r;
 
 	float y = 0;
 
 	glBegin(GL_POLYGON);
 	for (int i = 0; i < 40; i++) {
-		glVertex2f(x + ball.x, y + ball.y);
+		glVertex2f(x + ball->x, y + ball->y);
 
 		float tx = -y;
 		float ty = x;
@@ -141,13 +136,13 @@ void draw_ball(Ball_t ball)
 	glEnd();
 }
 
-void draw_game(Game_t game)
+void draw_game(Game_t* game)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	draw_player(game.player);
-	draw_player(game.cpu);
-	draw_ball(game.ball);
+	draw_player(game->player);
+	draw_player(game->cpu);
+	draw_ball(game->ball);
 
 	glFlush();
 
@@ -159,7 +154,7 @@ int get_time()
 	return SDL_GetTicks();
 }
 
-void cleanup()
+void clean_lib()
 {
 	SDL_DestroyWindow(window);
 	SDL_Quit();

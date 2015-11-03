@@ -9,11 +9,14 @@ int main()
 {
 	init_lib();
 
-	init_game();
+	Game_t* game = malloc(sizeof(game));
 
-	play();
+	init_game(game);
+	play(game);
 
-	cleanup();
+	clean_lib();
+	free(game);
+
 	return 0;
 }
 
