@@ -14,6 +14,7 @@ typedef enum {
 
 typedef struct Game {
 	States_t state;
+	unsigned int drawables[3];
 	Player_t* player;
 	Player_t* cpu;
 	Ball_t* ball;

@@ -6,6 +6,7 @@
 #include "game.h"
 
 SDL_Window *window;
+SDL_GLContext * context;
 
 void init_lib();
 void manage_input(Game_t*);
